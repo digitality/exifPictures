@@ -1,5 +1,3 @@
-This project is a practise while I learn python
-the main objective is a photo sorter for orginizing photos based on the photo's date in exif.
-
-Testing somehtin
+This project is mostly a practise while I learn python
+the main objective is to sort photos into directories based on exif data.
 
