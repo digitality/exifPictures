@@ -1,2 +1,4 @@
-test todo file, learning about git branches
-modified file
+clean up code a little
+add funciton for cleaning empty directories if all files are moved out of them
+add handling for images that contain no exif data
+possibly add funcitonality for sorting pictures by location/city they were taken
