@@ -1,31 +1,24 @@
 #!/usr/bin/python3
-'''zyklon's photo orginizer
-This program will read exif data to look for dates a photo was taken
-then crete directories and move photos into them
-pretty sure this now depends on gexiv2-dev - get mikuro to test'''
+'''Zyklon's image sorter'''
 
+import getopt
+import sys
 import os
 import shutil
 from gi.repository import GExiv2
 
-def getFileList(srcDIR):
-	'''first we need to get a list of files'''
+def usage():
+	print ("Usage Function")
 	
+def getFileList(srcDIR, recurse):
+	'''returns the list of files for processing'''
+
 	fileList = []
-	
-	while True:
-		recurse = input("recurse in source? Y/N ")
-		if recurse.lower() == "y":
-			recurse = True
-			break
-		elif recurse.lower() == "n":
-			recurse = False
-			break
-	
+
 	if recurse == True:
 		for r,d,f in os.walk(srcDIR):
 			for files in f:
-				if files.endswith(".JPG") or files.endswith(".JPEG") or files.endswith(".jpg") or files.endswith(".jpeg"):
+				if files.endswith(".JPG") or files.endswith(".JPEG") or files.endswith(".jpg") or files.endswith(".jpeg"):	#regex goes here
 					fileList.append(os.path.join(r,files))
 	
 	else:
@@ -35,27 +28,8 @@ def getFileList(srcDIR):
 	
 	return fileList
 
-def main():	
-	while True:				#check if src dir exists
-		srcDIR = input("Source directory of unsorted photos: ")
-		srcDIR = os.path.expanduser(srcDIR)
-		if os.path.exists(srcDIR):
-			break
-		else: print ("invalid path")
-	while True:				#check if output dir exists and create
-		destDIR = input("Destination for sorted photos: ")
-		destDIR = os.path.expanduser(destDIR)
-		if os.path.exists(destDIR):
-			print ("path exists")
-			break
-		else:
-			createDIR = input("Create output DIR? ")
-			if createDIR.lower() == "y":
-				os.makedirs(destDIR)
-				break
-	copymove = input("Would you like to copy or move the files? C/M ")
-	
-	for image in getFileList(srcDIR):									#Here's the magic bit
+def workerFunction(fileList, destDIR, moveFiles):
+	for image in fileList:									
 		try:
 			dateTaken = GExiv2.Metadata(image).get_date_time()
 			yearDIR = os.path.join(destDIR, str(dateTaken.year))
@@ -69,7 +43,7 @@ def main():
 			if not os.path.exists(dayDIR):
 				os.makedirs(dayDIR)
 		
-			if copymove.lower() == "m":
+			if moveFiles == True:
 				shutil.move(image, dayDIR)
 				print ("Moved", image, "to", dayDIR)
 			else:
@@ -78,10 +52,48 @@ def main():
 		else:
 			print ("No EXIF data for", image)
 
-		
-		
-		
-		
 
+def main():
+	
+	srcDIR = 'none'														#set initial values for options
+	destDIR = 'none'
+	recurse = False
+	moveFiles = False
+
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "hrmi:o:", ["help", "recursive", "move", "input=", "output="])
+	except getopt.GetoptError as err:
+		usage()
+		print(err)
+		sys.exit(2)
+	
+	for o, a in opts:													#check arguments and change initial values
+		if o == "-h":
+			usage()
+			sys.exit()
+			
+		elif o == "-r":
+			recurse = True
+			 
+		elif o == "-m":
+			moveFiles = True
+		
+		elif o in ("-i"):
+			srcDIR = os.path.expanduser(a)
+			
+		elif o in ("-o"):
+			destDIR = os.path.expanduser(a)
+
+	if not os.path.exists(srcDIR):										#check the input dir exists
+		print ("Input directory does not exist")
+		sys.exit(2)
+	elif not os.path.exists(destDIR):
+		os.makedirs(destDIR)
+		print ("Created Output directory")
+		
+																		
+	fileList = getFileList(srcDIR, recurse)
+	workerFunction(fileList, destDIR, moveFiles)
+	
 
 main()
