@@ -1,0 +1,12 @@
+exifPicture
+===========
+
+Overview
+--------
+
+This project is mostly a practise while I learn python
+the main objective is to sort photos into directories based on exif data.
+
+Requirements
+------------
+Currently only depends on libgexiv2 for exif data
