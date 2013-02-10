@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''Zyklon's image sorter'''
+'''Zyklon's image sorterrhhr'''
 
 import getopt
 import sys
@@ -8,7 +8,15 @@ import shutil
 from gi.repository import GExiv2
 
 def usage():
-	print ("Usage Function")
+	print ("""A photo sorting utility, sorts photos into a new directory by date
+	
+	Usage: exifPictures [-hrmio]"
+	
+	-h,	--help			Print this message and exit
+	-r,	--recursive		Recursive searching on input directory
+	-m,	--move			Move files instead of copy to output directory
+	-i,	--input			Input directory
+	-o,	--output		Output directory""")
 	
 def getFileList(srcDIR, recurse):
 	'''returns the list of files for processing'''
@@ -68,29 +76,28 @@ def main():
 		sys.exit(2)
 	
 	for o, a in opts:													#check arguments and change initial values
-		if o == "-h":
+		if o in ("-h", "--help"):
 			usage()
 			sys.exit()
 			
-		elif o == "-r":
+		elif o in ("-r", "--recursive"):
 			recurse = True
 			 
-		elif o == "-m":
+		elif o in ("-m", "--move"):
 			moveFiles = True
 		
-		elif o in ("-i"):
+		elif o in ("-i", "--input="):
 			srcDIR = os.path.expanduser(a)
+			if not os.path.exists(srcDIR):
+				print ("Input directory does not exist")
+				sys.exit(2)
 			
-		elif o in ("-o"):
+		elif o in ("-o", "--output="):
 			destDIR = os.path.expanduser(a)
+			if not os.path.exists(destDIR):
+				os.makedirs(destDIR)
+				print ("Created Output directory")
 
-	if not os.path.exists(srcDIR):										#check the input dir exists
-		print ("Input directory does not exist")
-		sys.exit(2)
-	elif not os.path.exists(destDIR):
-		os.makedirs(destDIR)
-		print ("Created Output directory")
-		
 																		
 	fileList = getFileList(srcDIR, recurse)
 	workerFunction(fileList, destDIR, moveFiles)
