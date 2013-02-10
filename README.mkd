@@ -9,4 +9,6 @@ the main objective is to sort photos into directories based on exif data.
 
 Requirements
 ------------
-Currently only depends on libgexiv2 for exif data
+depends on:
+libgexiv2 compiled with --enable-introspection for exif data
+python-gobject
