@@ -11,4 +11,4 @@ Requirements
 ------------
 depends on:
 libgexiv2 compiled with --enable-introspection for exif data
-python-gobject
+python-gobject for python bindings to work
